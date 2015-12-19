@@ -31,8 +31,8 @@ public class Map {
         }
     }
 
-    public boolean makeTurn(int player, int x, int y){
-        if(!isValidTurn(player, x, y)){
+    public boolean MakeTurn(int player, int x, int y){
+        if(!IsValidTurn(player, x, y)){
             return false;
         }
 
@@ -44,20 +44,20 @@ public class Map {
         return false;
     }
 
-    public boolean checkWin(int player, int x, int y){
-        if(checkWay(player, x, y, Way.DOWN)) return true;
-        if(checkWay(player, x, y, Way.UP)) return true;
-        if(checkWay(player, x, y, Way.LEFT)) return true;
-        if(checkWay(player, x, y, Way.RIGHT)) return true;
-        if(checkWay(player, x, y, Way.BOTTOM_LEFT)) return true;
-        if(checkWay(player, x, y, Way.BOTTOM_RIGHT)) return true;
-        if(checkWay(player, x, y, Way.TOP_LEFT)) return true;
-        if(checkWay(player, x, y, Way.TOP_RIGHT)) return true;
+    public boolean CheckWin(int player, int x, int y){
+        if(CheckWay(player, x, y, Way.DOWN)) return true;
+        if(CheckWay(player, x, y, Way.UP)) return true;
+        if(CheckWay(player, x, y, Way.LEFT)) return true;
+        if(CheckWay(player, x, y, Way.RIGHT)) return true;
+        if(CheckWay(player, x, y, Way.BOTTOM_LEFT)) return true;
+        if(CheckWay(player, x, y, Way.BOTTOM_RIGHT)) return true;
+        if(CheckWay(player, x, y, Way.TOP_LEFT)) return true;
+        if(CheckWay(player, x, y, Way.TOP_RIGHT)) return true;
 
         return false;
     }
 
-    private boolean checkWay(int player, int x, int y, Way way){
+    private boolean CheckWay(int player, int x, int y, Way way){
         int height = _MapArray.length;
         int width = _MapArray[0].length;
         int way_len = _short_line ? 3 : 5;
@@ -153,7 +153,7 @@ public class Map {
         return false;
     }
 
-    private boolean isValidTurn(int player, int x, int y){
+    private boolean IsValidTurn(int player, int x, int y){
         return (x < 0 || x >=  _MapArray[0].length ) &&
                 (y < 0 || y >=  _MapArray.length) &&
                 (player == 1 || player == 2);
