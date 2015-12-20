@@ -34,8 +34,12 @@ public class Room {
 
     public boolean MakeTurn(int player, int x, int y){
         if((_firstWorkerTurn && player == 1) || (!_firstWorkerTurn && player == 2)){
-            _firstWorkerTurn  = _firstWorkerTurn ? false : true;
-            return _map.MakeTurn(player, x, y);
+            if(_map.MakeTurn(player, x, y)){
+                _firstWorkerTurn  = _firstWorkerTurn ? false : true;
+                ClientWorker enemy = (player == 1) ? _workerA : _workerB;
+                enemy.SendTurn(x, y);
+                return true;
+            }
         }
 
         return  false;
