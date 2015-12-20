@@ -38,7 +38,7 @@ public class Server {
         server.bind(sAddr);
         System.out.format("Server is listening at %s%n", sAddr);
 
-        ClientWorker attach = new ClientWorker(GetRoomForNewClient());
+        ClientWorker attach = new ClientWorker(null);
         attach._server = server;
 
         server.accept(attach, new ConnectionHandler());
