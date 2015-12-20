@@ -24,6 +24,11 @@ public class ClientWorker {
     private boolean _reading;
 
     public ClientWorker(Room room) {
+        if(room == null){
+            _player = 0;
+            return;
+        }
+
         _room = room;
 
         _rHandler = new ReadHandler();
@@ -36,6 +41,20 @@ public class ClientWorker {
         _player = _room.IsFull() ? 2 : 1;
 
         System.out.println(_player);
+    }
+
+    public void SendTurn(int x, int y){
+        byte[] bytes = new byte[2];
+        bytes[0] = (byte)x;
+        bytes[1] = (byte)y;
+
+        _buffer.rewind();
+        _buffer.clear();
+
+        _buffer.put(bytes, 0, bytes.length);
+
+        _buffer.flip();
+        _client.write(_buffer, this, _wHandler);
     }
 
     class ReadHandler implements CompletionHandler<Integer, ClientWorker> {
@@ -69,7 +88,6 @@ public class ClientWorker {
                     int y = bytes[1];
 
                     turn_result[0] =  _room.MakeTurn(_player, x, y) ? (byte)0 : -1;
-                    System.out.println(turn_result[0]);
                 }else{
                     //WRITE ERROR CODE TO CLIENT
                     turn_result[0] =  -1; // error code
