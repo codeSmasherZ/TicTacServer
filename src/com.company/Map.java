@@ -32,7 +32,8 @@ public class Map {
     }
 
     public boolean MakeTurn(int player, int x, int y){
-        if(!IsValidTurn(player, x, y)){
+        if(!IsValidTurn(player, x, y) ||
+                x >= _MapArray[0].length || y >= _MapArray.length){
             return false;
         }
 
