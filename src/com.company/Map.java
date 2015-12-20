@@ -8,8 +8,8 @@ package com.company;
  */
 
 public class Map {
-    int[][] _MapArray;
-    boolean _short_line;
+    private int[][] _MapArray;
+    private boolean _short_line;
 
     public Map(int width, int height, boolean short_line){
         if(short_line){

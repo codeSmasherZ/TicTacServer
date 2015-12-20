@@ -1,15 +1,18 @@
 package com.company;
 
 public class Room {
-    ClientWorker _workerA;
-    ClientWorker _workerB;
+    private ClientWorker _workerA;
+    private ClientWorker _workerB;
 
-    boolean _firstWorkerTurn;
-    boolean _isFull;
+    private boolean _firstWorkerTurn;
+    private boolean _full;
+
+    private Map _map;
 
     public Room(){
         _firstWorkerTurn = true;
-        _isFull = false;
+        _full = false;
+        _map = new Map(3, 3, true);
     }
 
     public boolean Add(ClientWorker worker){
@@ -18,14 +21,23 @@ public class Room {
             return true;
         }else if(_workerB == null){
             _workerB = worker;
-            _isFull = true;
+            _full = true;
             return true;
         }
 
         return false;
     }
 
-    public boolean isFull(){
-        return _isFull;
+    public boolean MakeTurn(int player, int x, int y){
+        if((_firstWorkerTurn && player == 1) || (!_firstWorkerTurn && player == 2)){
+            return _map.MakeTurn(player, x, y);
+        }
+
+        return  false;
+    }
+
+    public boolean IsFirstWorkerTurn() { return _firstWorkerTurn; }
+    public boolean IsFull(){
+        return _full;
     }
 }

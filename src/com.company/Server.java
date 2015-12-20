@@ -7,10 +7,28 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.nio.channels.WritePendingException;
+import java.util.ArrayList;
 
 public class Server {
-    public static final int BUFFER_SIZE = 2048;
+    private static final ArrayList<Room> _Rooms = new ArrayList<>();
+
+    public static final int BUFFER_SIZE = 512;
+
+    //Search for free room or creates new one
+    private Room GetRoomForNewClient(){
+        Room room = null;
+
+        if(_Rooms.size() > 0){
+            if(!_Rooms.get(_Rooms.size()-1).IsFull()){
+                room = _Rooms.get(_Rooms.size()-1);
+            }
+        }else{
+            room = new Room();
+            _Rooms.add(room);
+        }
+
+        return room;
+    }
 
     public Server(String host, int port) throws Exception{
         AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open();
@@ -19,8 +37,8 @@ public class Server {
         server.bind(sAddr);
         System.out.format("Server is listening at %s%n", sAddr);
 
-        ClientWorker attach = new ClientWorker();
-        attach.server = server;
+        ClientWorker attach = new ClientWorker(GetRoomForNewClient());
+        attach._server = server;
 
         server.accept(attach, new ConnectionHandler());
     }
@@ -32,15 +50,15 @@ public class Server {
                 SocketAddress clientAddr = client.getRemoteAddress();
 
                 System.out.format("Accepted a  connection from  %s%n", clientAddr);
-                attach.server.accept(attach, this);
+                attach._server.accept(attach, this);
 
-                ClientWorker newAttach = new ClientWorker();
-                newAttach.server = attach.server;
-                newAttach.client = client;
-                newAttach.buffer = ByteBuffer.allocate(BUFFER_SIZE);
-                newAttach.clientAddr = clientAddr;
-                newAttach.isReading = true;
-                client.read(newAttach.buffer, newAttach, newAttach.rHandler);
+                ClientWorker newAttach = new ClientWorker(GetRoomForNewClient());
+                newAttach._server = attach._server;
+                newAttach._client = client;
+                newAttach._buffer = ByteBuffer.allocate(BUFFER_SIZE);
+                newAttach._clientAddr = clientAddr;
+                newAttach._reading = true;
+                client.read(newAttach._buffer, newAttach, newAttach._rHandler);
             } catch (IOException e) {
                 e.printStackTrace();
             }
