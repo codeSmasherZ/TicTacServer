@@ -16,16 +16,17 @@ public class Server {
 
     //Search for free room or creates new one
     private Room GetRoomForNewClient(){
-        Room room = null;
+        Room room;
 
         if(_Rooms.size() > 0){
             if(!_Rooms.get(_Rooms.size()-1).IsFull()){
                 room = _Rooms.get(_Rooms.size()-1);
+                return room;
             }
-        }else{
-            room = new Room();
-            _Rooms.add(room);
         }
+
+        room = new Room();
+        _Rooms.add(room);
 
         return room;
     }
@@ -57,7 +58,6 @@ public class Server {
                 newAttach._client = client;
                 newAttach._buffer = ByteBuffer.allocate(BUFFER_SIZE);
                 newAttach._clientAddr = clientAddr;
-                newAttach._reading = true;
                 client.read(newAttach._buffer, newAttach, newAttach._rHandler);
             } catch (IOException e) {
                 e.printStackTrace();
