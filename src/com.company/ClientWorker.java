@@ -6,9 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.nio.channels.WritePendingException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 
 
 public class ClientWorker {
@@ -22,15 +20,22 @@ public class ClientWorker {
     WriteHandler _wHandler;
 
     private Room _room;
-
-    boolean _reading = false;
+    private int _player;
+    private boolean _reading;
 
     public ClientWorker(Room room) {
         _room = room;
+
         _rHandler = new ReadHandler();
         _wHandler = new WriteHandler();
+        _reading = false;
+
+        System.out.println(_room);
 
         _room.Add(this);
+        _player = _room.IsFull() ? 2 : 1;
+
+        System.out.println(_player);
     }
 
     class ReadHandler implements CompletionHandler<Integer, ClientWorker> {
@@ -54,18 +59,34 @@ public class ClientWorker {
             attach._buffer.get(bytes, 0, limits);
 
             try {
-                Charset cs = Charset.forName("UTF-8");
-                String msg = new String(bytes, cs);
-                System.out.format("Client at  %s  says: %s%n", attach._clientAddr, msg);
+                //Make player turn
 
-                //Do write here
-                //WriteBroadcast(msg.getBytes("UTF8"));
+                byte[] turn_result = new byte[1];
+
+                if((_room.IsFirstPlayerTurn() && _player == 1) ||
+                        (!_room.IsFirstPlayerTurn() && _player == 2) ) {
+                    int x = bytes[0];
+                    int y = bytes[1];
+
+                    turn_result[0] =  _room.MakeTurn(_player, x, y) ? (byte)0 : -1;
+                    System.out.println(turn_result[0]);
+                }else{
+                    //WRITE ERROR CODE TO CLIENT
+                    turn_result[0] =  -1; // error code
+                }
+
+
+                attach._buffer.rewind();
+                attach._buffer.clear();
+
+                attach._buffer.put(turn_result, 0, turn_result.length);
+
+                attach._buffer.flip();
+                attach._client.write(attach._buffer, attach, attach._wHandler);
+
             }catch (Throwable ex){
                 ex.printStackTrace();
             }
-
-            //attach._buffer.rewind();
-            //attach._client.write(attach._buffer, attach, this);
         }
 
         @Override
